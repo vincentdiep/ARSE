@@ -1,0 +1,11 @@
+
+  canvas.canvas-grid {
+    display: block;
+    content: "";
+    position: absolute;
+    background-image: radial-gradient(grey 1px, transparent 1px);
+    background-size: 10px 10px;
+    background-position: 5px 5px;
+    z-index: 99;
+  }
+  
