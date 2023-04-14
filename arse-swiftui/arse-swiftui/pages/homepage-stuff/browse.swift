@@ -122,7 +122,7 @@ class FetchProductListModel: ObservableObject {
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
                 do {
-                    print("Data: ")
+                    print("data: ")
                     print(data)
                     let decodedResponse = try JSONDecoder().decode(ProductListData.self, from: data)
                     DispatchQueue.main.async {

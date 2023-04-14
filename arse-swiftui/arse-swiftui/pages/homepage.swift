@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct homepage: View {
-    @State var navTitle = "Home"
+    @State var navTitle = "Homepage"
     var color: Color = .white
     @State var isButtonOn = true
     

@@ -13,7 +13,7 @@ struct Search: View {
     var body: some View {
         NavigationView{
             List(0 ..< 5) { item in
-                Text("Bruh")
+                Text("items")
             }
             .searchable(text: $text, placement: .navigationBarDrawer(displayMode: .always), prompt: Text("Explore our appliances"))
             .navigationTitle("Search")

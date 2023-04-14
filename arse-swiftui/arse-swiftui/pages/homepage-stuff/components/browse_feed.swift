@@ -12,7 +12,7 @@ struct browse_feed: View {
     
     
     var body: some View {
-        Text("bruh")
+        Text("bruha")
     }
 }
 

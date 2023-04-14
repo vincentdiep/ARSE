@@ -9,7 +9,7 @@ import SwiftUI
 
 struct arpage: View {
     var body: some View {
-        Text("AR Stuff")
+        Text("AR Stuffs")
     }
 }
 

@@ -19,7 +19,7 @@ struct item_display: View {
                     image.resizable()
                         .aspectRatio(contentMode: .fit)
                 }placeholder: {
-                    Text("loading")
+                    Text("loading...")
                 }.frame(height: 500) // Set the height to your desired value
                 .ignoresSafeArea(.all, edges: .top)
             }

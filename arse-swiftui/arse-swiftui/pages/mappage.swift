@@ -9,7 +9,7 @@ import SwiftUI
 
 struct mappage: View {
     var body: some View {
-        Text("Map Stuff")
+        Text("Map Stuffs")
     }
 }
 

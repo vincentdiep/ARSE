@@ -10,7 +10,7 @@ import SwiftUI
 struct categorize: View {
     var body: some View {
         NavigationView {
-            NavigationLink(destination: brands(), label: {Text("yiipe")})
+            NavigationLink(destination: brands(), label: {Text("category template")})
         }
     }
 }
