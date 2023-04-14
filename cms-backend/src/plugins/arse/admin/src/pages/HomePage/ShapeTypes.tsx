@@ -6,7 +6,6 @@ export interface ShapePosition {
 }
 
 export interface Shape {
-  alive: boolean;
   name: string;
   shape: string;
   color: string;
