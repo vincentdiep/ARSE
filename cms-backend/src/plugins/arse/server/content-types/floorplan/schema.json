@@ -1,16 +1,16 @@
 
-export const floorplan = {
+{
   "kind": "collectionType",
   "collectionName": "floorplans",
   "info": {
     "singularName": "floorplan",
     "pluralName": "floorplans",
-    "displayName": "Floorplan"
+    "displayName": "floorplan"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": true,
+    "comment": ""
   },
-  "pluginOptions": {},
   "attributes": {
     "name": {
       "type": "string"

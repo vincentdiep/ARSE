@@ -6,4 +6,4 @@
 
 const { createCoreRouter } = require('@strapi/strapi').factories;
 
-module.exports = createCoreRouter('api::floorplan.floorplan');
+module.exports = createCoreRouter('plugin::arse.floorplan');

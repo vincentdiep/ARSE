@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * floorplan service
+ *  service
  */
 
 const { createCoreService } = require('@strapi/strapi').factories;
 
-module.exports = createCoreService('api::floorplan.floorplan');
+module.exports = createCoreService('plugin::arse.floorplan');
