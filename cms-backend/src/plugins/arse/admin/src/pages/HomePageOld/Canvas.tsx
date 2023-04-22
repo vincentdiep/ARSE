@@ -28,66 +28,74 @@ const Canvas: React.FC<CanvasProps> = ({ savedShapes, addShape, tempShape, setTe
     return Math.round(value / GRID_SIZE) * GRID_SIZE;
   }
 
-  function fixOffsetX(x, canvas: HTMLCanvasElement) {
+  function fixOffsetX(x: number, canvas_left_edge: number) {
+    return x - canvas_left_edge
+  }
+
+  function fixOffsetY(y: number, canvas_top_edge: number) {
+    return y - canvas_top_edge
+  }
+  function fixAndSnapX(x:number) {
+    const canvas = canvasRef.current;
     if (canvas) {
       const canvasRect = canvas.getBoundingClientRect();
-      x = x - canvasRect.left
+      return snapToGrid(fixOffsetX(x, canvasRect.left))
     }
     return x
   }
-
-  function fixOffsetY(y, canvas: HTMLCanvasElement) {
+  function fixAndSnapY(y:number) {
+    const canvas = canvasRef.current;
     if (canvas) {
       const canvasRect = canvas.getBoundingClientRect();
-      y = y - canvasRect.top
+      return snapToGrid(fixOffsetY(y, canvasRect.top))
     }
     return y
   }
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    setStartPos({ x: event.clientX, y: event.clientY });
+    setStartPos({
+       x: fixAndSnapX(event.clientX), 
+       y: fixAndSnapY(event.clientY) 
+      });
     setEndPos(null);
   };
 
-  const make_shape = (alive=false) => {
+  const make_shape = () => {
     if (startPos && endPos) {
       const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          var rectWidth = snapToGrid(fixOffsetX(endPos!.x, canvas) - startPos!.x);
-          var rectHeight = snapToGrid(fixOffsetY(endPos!.y, canvas) - startPos!.y);
-          const shapePosition: ShapePosition = {
-            x: snapToGrid(startPos!.x),
-            y: snapToGrid(startPos!.y),
-            w: rectWidth,
-            h: rectHeight,
-          };
-          const shape: Shape = {
-            alive: alive,
-            name: name,
-            shape: shapeType,
-            color: color,
-            pos: shapePosition,
-          };
-          return shape
-        }
+      var rectWidth = endPos!.x - startPos!.x;
+      var rectHeight = endPos!.y - startPos!.y;
+      const shapePosition: ShapePosition = {
+        x: startPos!.x,
+        y: startPos!.y,
+        w: rectWidth,
+        h: rectHeight,
+      };
+      const shape: Shape = {
+        name: name,
+        shape: shapeType,
+        color: color,
+        pos: shapePosition,
+      };
+      return shape
       }
     }
-  };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (startPos) {
-      setEndPos({ x: event.clientX, y: event.clientY });
+      setEndPos({
+        x: fixAndSnapX(event.clientX), 
+        y: fixAndSnapY(event.clientY)
+      });
     }
-    const shape: Shape | undefined = make_shape(false);
+    const shape: Shape | undefined = make_shape();
     if (shape) {
       setTempShape(shape);
     }
   };
   
   const handleMouseUp = () => {
-    const shape: Shape | undefined = make_shape(true)
+    const shape: Shape | undefined = make_shape()
     if (shape) {
       addShape(shape);
       setStartPos(null);
@@ -103,7 +111,7 @@ const Canvas: React.FC<CanvasProps> = ({ savedShapes, addShape, tempShape, setTe
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         savedShapes.forEach((shape) => {
-          if (shape.alive && shape.shape === 'rectangle') {
+          if (shape.shape === 'rectangle') {
             ctx.strokeStyle = shape.color;
             ctx.strokeRect(shape.pos.x, shape.pos.y, shape.pos.w, shape.pos.h);
           }
@@ -120,7 +128,7 @@ const Canvas: React.FC<CanvasProps> = ({ savedShapes, addShape, tempShape, setTe
   // Redraw all shapes when savedShapes changes
   React.useEffect(() => {
     drawShapes();
-  }, [savedShapes]);
+  }, [savedShapes, tempShape]);
 
   return (
     <canvas

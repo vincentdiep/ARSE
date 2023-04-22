@@ -13,7 +13,9 @@ RUN npm run build
 
 # will this break?
 WORKDIR /opt/app/src/plugins/arse
-RUN npm install && npm run build
+RUN npm install
+COPY ./src/plugins/arse .
+RUN npm run build
 
 WORKDIR /opt/app
 
