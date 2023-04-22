@@ -20,13 +20,10 @@ interface ServerMessage {
 }
 export const StoreMap = (imgFile: File) => {
   var editor = 'https://embed.diagrams.net/?embed=1&ui=atlas&spin=1&proto=json';
-  var initial = null;
-  var name = null;
+  var initial: string | null = null;
+  var name: string | null = null;
   const imageRef = useRef(null);
 
-  useEffect(() => {
-    load();
-  }, []);
 
   const setItem = (key: string, mi: mapImg) => {
     const sm: StoredMap = {
@@ -43,7 +40,7 @@ export const StoreMap = (imgFile: File) => {
     let res = await fetch(imageSrc);
     let data = await res.text();
     const parser = new DOMParser();
-    const svg: SVGSVGElement = parser
+    const svg: SVGSVGElement | null = parser
       .parseFromString(data, 'image/svg+xml')
       .querySelector('svg');
 
@@ -59,12 +56,20 @@ export const StoreMap = (imgFile: File) => {
     return s;
   };
 
-  function getItem(key: string): StoredMap {
-    var draft: StoredMap = JSON.parse(localStorage.getItem(key));
-    if (draft != null) {
-      draft = null;
+  let updateImgSrc = (src) => {
+    imageRef.current.setAttribute('src', src);
+
+  }
+
+  function getItem(key: string): StoredMap | null {
+    var s = localStorage.getItem(key)
+    if (s != null) {
+      var draft: StoredMap | null = JSON.parse(s);
+      if (draft != null) {
+        return draft;
+      }
     }
-    return draft;
+    return null;
   }
 
   const edit = () => {
@@ -79,61 +84,65 @@ export const StoreMap = (imgFile: File) => {
     var draft = getItem('.draft-' + name);
 
     var receive = async function (evt) {
-      if (evt.data.length > 0) {
-        var msg: ServerMessage = JSON.parse(evt.data);
-        console.log(msg);
-        if (msg.event == 'init') {
-          if (draft != null) {
+      var src = imageRef.current.getAttribute('src');
+      if (iframe.contentWindow != null && imageRef.current != null) {
+        if (evt.data.length > 0) {
+          var msg: ServerMessage = JSON.parse(evt.data);
+          console.log(msg);
+          if (msg.event == 'init') {
+            if (draft != null) {
+              iframe.contentWindow.postMessage(
+                JSON.stringify({
+                  action: 'load',
+                  autosave: 1,
+                  xml: draft.mapImg.xml,
+                }),
+                '*'
+              );
+              iframe.contentWindow.postMessage(
+                JSON.stringify({ action: 'status', modified: true }),
+                '*'
+              );
+            } else {
+              const svg = await getSVGdata(src);
+              const svg_node = svg ? serializeSVG(svg) : null;
+              iframe.contentWindow.postMessage(
+                JSON.stringify({
+                  action: 'load',
+                  autosave: 1,
+                  xml: svg_node,
+                }),
+                '*'
+              );
+            }
+          } else if (msg.event == 'export') {
+            imageRef.current.setAttribute('src', msg.data);
+            setItem('' + name, { data: msg.data });
+            localStorage.removeItem('.draft-' + name);
+            draft = null;
+            close();
+          } else if (msg.event == 'autosave') {
+            setItem('.draft-' + name, { xml: msg.xml });
+          } else if (msg.event == 'save') {
             iframe.contentWindow.postMessage(
               JSON.stringify({
-                action: 'load',
-                autosave: 1,
-                xml: draft.mapImg.xml,
+                action: 'export',
+                format: 'xmlpng',
+                xml: msg.xml,
+                spin: 'Updating page',
               }),
               '*'
             );
-            iframe.contentWindow.postMessage(
-              JSON.stringify({ action: 'status', modified: true }),
-              '*'
-            );
-          } else {
-            const svg = await getSVGdata(imageRef.current.getAttribute('src'));
-            const svg_node = svg ? serializeSVG(svg) : null;
-            iframe.contentWindow.postMessage(
-              JSON.stringify({
-                action: 'load',
-                autosave: 1,
-                xml: svg_node,
-              }),
-              '*'
-            );
+            setItem('.draft-' + name, { xml: msg.xml });
+          } else if (msg.event == 'exit') {
+            localStorage.removeItem('.draft-' + name);
+            draft = null;
+            close();
           }
-        } else if (msg.event == 'export') {
-          imageRef.current.setAttribute('src', msg.data);
-          setItem(name, { data: msg.data });
-          localStorage.removeItem('.draft-' + name);
-          draft = null;
-          close();
-        } else if (msg.event == 'autosave') {
-          setItem('.draft-' + name, { xml: msg.xml });
-        } else if (msg.event == 'save') {
-          iframe.contentWindow.postMessage(
-            JSON.stringify({
-              action: 'export',
-              format: 'xmlpng',
-              xml: msg.xml,
-              spin: 'Updating page',
-            }),
-            '*'
-          );
-          setItem('.draft-' + name, { xml: msg.xml });
-        } else if (msg.event == 'exit') {
-          localStorage.removeItem('.draft-' + name);
-          draft = null;
-          close();
         }
       }
     };
+
     window.addEventListener('message', receive);
     iframe.setAttribute('src', editor);
     document.body.appendChild(iframe);
@@ -145,25 +154,37 @@ export const StoreMap = (imgFile: File) => {
         ? window.location.hash.substring(1)
         : 'default';
 
-    var current: StoredMap = getItem(name);
+    var current: StoredMap | null = getItem(name);
 
     console.log(current);
     if (current != null) {
-      imageRef.current.setAttribute('src', current.mapImg.data);
+      if (imageRef.current != null) {
+        imageRef.current.setAttribute('src', current.mapImg.data);
+      }
     } else {
-      imageRef.current.setAttribute('src', initial);
+      if (imageRef.current != null) {
+        imageRef.current.setAttribute('src', initial);
+      }
     }
   }
   function load() {
-    initial = imageRef.current.getAttribute('src');
-    start();
+    if (imageRef.current != null) {
+      initial = imageRef.current.getAttribute('src');
+      start();
+    }
   }
 
   function clearLocalStores() {
     localStorage.clear();
-    imageRef.current.setAttribute('src', initial);
+    if (imageRef.current != null) {
+      imageRef.current.setAttribute('src', initial);
+    }
   }
   window.addEventListener('hashchange', start);
+
+  useEffect(() => {
+    load();
+  }, [imageRef]);
 
   return (
     <div>
@@ -171,7 +192,7 @@ export const StoreMap = (imgFile: File) => {
       <div
         style={{
           position: 'fixed',
-          fontFamily: ['Arial', 'Helvetica'],
+          fontFamily: 'Arial',
           fontSize: '10pt',
           color: '#cccccc',
           bottom: '0px',
@@ -190,4 +211,4 @@ export const StoreMap = (imgFile: File) => {
       </button>
     </div>
   );
-};
+}

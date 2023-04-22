@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { useRef, useState } from 'react';
+import React, { useEffect, useState, useRef} from 'react';
 import './style.css';
+import pluginId from '../../pluginId';
 import { StoreMap } from './StoreMap';
 
 export default function App() {
