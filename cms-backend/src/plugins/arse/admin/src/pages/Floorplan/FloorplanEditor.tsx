@@ -23,7 +23,7 @@ interface Props {
   clearDraft
 }
 
-export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDraft}) => {
+export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDraft, close}) => {
 
   var editor = 'https://embed.diagrams.net/?embed=1&ui=atlas&spin=1&proto=json';
   var initial: string | null = null;

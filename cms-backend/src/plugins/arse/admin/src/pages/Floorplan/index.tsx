@@ -12,6 +12,7 @@ export default function App() {
   var floorplan_fp = useRef(null);
   const [imgFile, setImgFile] = React.useState<FloorplanImgData>();
   const [errorMsg, setErrorMsg]  = React.useState<string>("");
+  const [editorOpen, setEditorOpen]  = React.useState<boolean>(false);
   const [imgSrc, setImgSrc]  = React.useState<string>("fp.svg");
   var name: string | null = null;
   var draft: Floorplan | null;
@@ -59,8 +60,9 @@ export default function App() {
 
   const onChangeInput = (e) => {
     const file = e.target.files[0];
-    console.log(file);
+    
     setImgFile(file);
+    
   };
 
   const uploadClick = (e) => {
@@ -72,8 +74,12 @@ export default function App() {
     }
   };
 
-  const editImg = (e) => {
+  const close = () => {
+    setEditorOpen(false);
+  }
 
+  const editImg = (e) => {
+    setEditorOpen(true);
   }
 
   return (
@@ -88,7 +94,14 @@ export default function App() {
       />
       <img ref={imageRef} id="image" src={imgSrc} onClick={editImg}  />
       <p>Click floorplan to edit</p>
-      <FloorplanEditor imgFile={imgFile} setImgFile={setImgFile} imgSrc={imgSrc} setImgSrc={setImgSrc} clearDraft={clearDraft} />
+      { editorOpen &&
+      (<FloorplanEditor imgFile={imgFile}
+                        setImgFile={setImgFile}
+                        imgSrc={imgSrc}
+                        setImgSrc={setImgSrc}
+                        clearDraft={clearDraft}
+                        close={close} />)}
+
       <button onClick={uploadClick}>Save</button>
     </div>
   );
