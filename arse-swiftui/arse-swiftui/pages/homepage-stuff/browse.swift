@@ -173,7 +173,7 @@ struct browse: View {
     }
     
     var body: some View {
-        VStack{
+        VStack {
                     deal()
                     NavigationView {
                         List(productListModel.products, id: \.self) { product in
@@ -195,7 +195,7 @@ struct browse: View {
                                                     Text("loading...")
                                                 }
                                             }
-                                            Text(String(product.attributes.sku))
+                                            Text(String(product.attributes.group.data.attributes.name))
                                             .font(.headline)
                 //                        Text(String(product.attributes.description))
                                     }})
