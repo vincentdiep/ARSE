@@ -1,11 +1,7 @@
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './storemapStyle.css';
 
-export interface FloorplanImgData {
-  xml?: string;
-  data?: string;
-}
+import { FloorplanImgData, Floorplan } from './FloorplanTypes';
 
 interface ServerMessage {
   event: string;
@@ -20,10 +16,11 @@ interface Props {
   setImgFile,
   imgSrc: string,
   setImgSrc,
-  clearDraft
+  clearDraft,
+  closeFrame
 }
 
-export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDraft, close}) => {
+export const FloorplanEditor = (props: Props) => {
 
   var editor = 'https://embed.diagrams.net/?embed=1&ui=atlas&spin=1&proto=json';
   var initial: string | null = null;
@@ -32,8 +29,8 @@ export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDr
 
   let getSVGdata = (): Promise<SVGSVGElement | undefined> => {
     return new Promise((resolve, reject) => {
-      if (imgSrc) {
-        fetch(imgSrc)
+      if (props.imgSrc) {
+        fetch(props.imgSrc)
           .then((res) => res.text())
           .then((data) => {
             const parser = new DOMParser();
@@ -68,12 +65,12 @@ export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDr
           var msg: ServerMessage = JSON.parse(evt.data);
           console.log(msg);
           if (msg.event == 'init') {
-            if (imgFile != null) {
+            if (props.imgFile != null) {
               iframeWindow.postMessage(
                 JSON.stringify({
                   action: 'load',
                   autosave: 1,
-                  xml: imgFile.xml,
+                  xml: props.imgFile.xml,
                 }),
                 '*'
               );
@@ -99,12 +96,12 @@ export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDr
               });
             }
           } else if (msg.event == 'export') {
-            setImgSrc(msg.data)
-            setImgFile({ data: msg.data });
-            clearDraft();
-            close();
+            props.setImgSrc(msg.data)
+            props.setImgFile({ data: msg.data });
+            props.clearDraft();
+            props.closeFrame();
           } else if (msg.event == 'autosave') {
-            setImgFile({ xml: msg.xml });
+            props.setImgFile({ xml: msg.xml });
           } else if (msg.event == 'save') {
             iframeWindow.postMessage(
               JSON.stringify({
@@ -115,10 +112,10 @@ export const FloorplanEditor = ({imgFile, setImgFile, imgSrc, setImgSrc, clearDr
               }),
               '*'
             );
-            setImgFile({ xml: msg.xml });
+            props.setImgFile({ xml: msg.xml });
           } else if (msg.event == 'exit') {
-            clearDraft();
-            close();
+            props.clearDraft();
+            props.closeFrame();
           }
         }
       }
