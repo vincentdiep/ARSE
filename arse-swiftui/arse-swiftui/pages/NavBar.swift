@@ -12,26 +12,27 @@ struct NavBar: View {
     @State var showSearch = false;
     
     var body: some View {
-        ZStack{
-            Color.clear
-                .background(Color.white)
-                .shadow(color: Color.gray, radius: 50, x: 0, y: -5)
+        HStack{
+//            Color.clear
+//                .background(Color.white)
+//                .shadow(color: Color.gray, radius: 10, x: 0, y: -5)
+//
+            Text(title).font(.system(size: 25)).padding(.leading, 20).padding(.trailing, 10)
             
-            Image(systemName: "dishwasher")
-                .font(.system(size: 30))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 20)
+            HStack{
+                Text("Search").padding(15).foregroundColor(.gray).font(.system(size: 20))
+                Button{ showSearch = true } label: {
+                    Image(systemName: "magnifyingglass.circle").font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 20).foregroundColor(.gray)
+                }.sheet(isPresented: $showSearch) {
+                    Search()
+                }
+            }.cornerRadius(20).overlay( /// apply a rounded border
+                RoundedRectangle(cornerRadius: 100)
+                    .stroke(.black, lineWidth: 2)
+            ).padding(.trailing, 20)
             
-            Text(title).font(.system(size: 25))
-            
-            Button{ showSearch = true } label: {
-                Image(systemName: "magnifyingglass.circle").font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 20)
-            }.sheet(isPresented: $showSearch) {
-                Search()
-            }
                 
-        }.frame(height: 70)
-            .frame(maxHeight: .infinity, alignment: .top)
+        }.frame(height: 90).background(.white).shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 4)
     }
 }
 

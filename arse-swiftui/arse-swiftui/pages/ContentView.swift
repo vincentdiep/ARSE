@@ -77,10 +77,23 @@ struct ContentView: View {
                 Text("Map")
             }
             arpage().tabItem {
-                Image(systemName: "plus.viewfinder")
-                Text("AR")
+                Image(systemName: "camera.viewfinder")
+                Text("AR Mode")
             }
         }.shadow(color: Color.red, radius: 50, x: 0, y: 10)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
 //        .overlay(
 //
